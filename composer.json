@@ -1,5 +1,5 @@
 {
-    "naume": "vlotysh/bot-gram-php",
+    "name": "vlotysh/bot-gram-php",
     "description": "PHP client for telegram",
     "type": "library",
     "autoload": {
