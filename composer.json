@@ -3,6 +3,7 @@
     "version": "0.0.1",
     "description": "PHP client for telegram",
     "type": "library",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "VLotysh\\BotGram\\": "src/"
