@@ -4,11 +4,18 @@ namespace VLotysh\BotGram;
 
 class Handler
 {
+    /**
+     * @var array
+     */
     private array $regexpCallbacks = [];
 
+    /**
+     * @param array $updateData
+     * @return void
+     */
     public function execute(array $updateData): void
     {
-        $text = $updateData['chat']['text'] ?? '';
+        $text = $updateData['message']['text'] ?? '';
 
         foreach ($this->regexpCallbacks as $callback) {
             list($callbackRegexp, $handler) = $callback;
@@ -19,6 +26,11 @@ class Handler
         }
      }
 
+    /**
+     * @param string $regexp
+     * @param callable $handler
+     * @return void
+     */
     public function addCallback(string $regexp, callable $handler): void
     {
         $this->regexpCallbacks[] = [
@@ -27,6 +39,10 @@ class Handler
         ];
     }
 
+    /**
+     * @param string $regexp
+     * @return bool
+     */
     public function hasCallback(string $regexp): bool
     {
         foreach ($this->regexpCallbacks as $callback) {
@@ -38,6 +54,9 @@ class Handler
         return false;
     }
 
+    /**
+     * @return void
+     */
     public function clearCallbacks()
     {
         $this->regexpCallbacks = [];

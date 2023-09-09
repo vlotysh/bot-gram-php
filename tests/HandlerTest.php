@@ -15,7 +15,7 @@ class HandlerTest extends TestCase
         $handler->addCallback('/^\/test/',$this->getCallbackFunction($result));
 
         $handler->execute([
-            'chat' => [
+            'message' => [
                 'text' => '/test'
             ]
         ]);
@@ -31,7 +31,7 @@ class HandlerTest extends TestCase
         $handler->addCallback('/^(.+)$/', $this->getCallbackFunction($result));
 
         $handler->execute([
-            'chat' => [
+            'message' => [
                 'text' => 'any text'
             ]
         ]);
@@ -63,7 +63,7 @@ class HandlerTest extends TestCase
     private function getCallbackFunction(&$result): callable
     {
         return function ($updateData) use (&$result) {
-            $result = $updateData['chat']['text'];
+            $result = $updateData['message']['text'];
         };
     }
 }
