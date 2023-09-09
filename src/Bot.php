@@ -5,6 +5,7 @@ namespace VLotysh\BotGram;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Facades\Log;
 
 class Bot
 {
@@ -36,13 +37,14 @@ class Bot
      */
     public function sendMessage(int $chatId, string $message, array $replyMarkup = []): bool
     {
-        $replyMarkup = json_encode($replyMarkup);
-
         $data = [
             "chat_id" => $chatId,
             "text" => $message,
-            "reply_markup" => $replyMarkup,
         ];
+
+        if (!empty($replyMarkup)) {
+            $data['reply_markup'] = $replyMarkup;
+        }
 
         $this->client->post('sendMessage', [
             RequestOptions::JSON => $data
