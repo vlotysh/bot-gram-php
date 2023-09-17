@@ -22,6 +22,8 @@ class Handler
 
             if (preg_match($callbackRegexp, $text)) {
                 $handler($updateData);
+
+                return;
             }
         }
      }
