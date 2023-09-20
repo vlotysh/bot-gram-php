@@ -38,8 +38,8 @@ class Bot
     public function sendMessage(int $chatId, string $message, array $replyMarkup = []): bool
     {
         $data = [
-            "chat_id" => $chatId,
-            "text" => $message,
+            'chat_id' => $chatId,
+            'text' => $message,
         ];
 
         if (!empty($replyMarkup)) {
@@ -47,6 +47,25 @@ class Bot
         }
 
         $this->client->post('sendMessage', [
+            RequestOptions::JSON => $data
+        ]);
+
+        return true;
+    }
+
+    public function editMessage(int $chatId, int $messageId, string $message, array $replyMarkup = []): bool
+    {
+        $data = [
+            'chat_id' => $chatId,
+            'message_id' => $messageId,
+            'text' => $message,
+        ];
+
+        if (!empty($replyMarkup)) {
+            $data['reply_markup'] = $replyMarkup;
+        }
+
+        $this->client->post('editMessageText', [
             RequestOptions::JSON => $data
         ]);
 
