@@ -3,6 +3,7 @@
 namespace VLotysh\BotGram\Tests;
 
 use PHPUnit\Framework\TestCase;
+use VLotysh\BotGram\Context;
 use VLotysh\BotGram\Handler;
 
 class HandlerTest extends TestCase
@@ -12,11 +13,14 @@ class HandlerTest extends TestCase
         $handler = new Handler();
 
         $result = '';
-        $handler->addCallback('/^\/test/',$this->getCallbackFunction($result));
+        $handler->addTextHandler('/^\/test/',$this->getCallbackFunction($result));
 
         $handler->execute([
             'message' => [
-                'text' => '/test'
+                'text' => '/test',
+                'chat' => [
+                    'id' => 1,
+                ],
             ]
         ]);
 
@@ -28,11 +32,14 @@ class HandlerTest extends TestCase
         $handler = new Handler();
         $result = '';
 
-        $handler->addCallback('/^(.+)$/', $this->getCallbackFunction($result));
+        $handler->addTextHandler('/^(.+)$/', $this->getCallbackFunction($result));
 
         $handler->execute([
             'message' => [
-                'text' => 'any text'
+                'text' => 'any text',
+                'chat' => [
+                    'id' => 1,
+                ]
             ]
         ]);
 
@@ -44,9 +51,9 @@ class HandlerTest extends TestCase
         $handler = new Handler();
         $result = '';
 
-        $handler->addCallback('/^(.+)$/', $this->getCallbackFunction($result));
+        $handler->addTextHandler('/^(.+)$/', $this->getCallbackFunction($result));
 
-        $this->assertTrue($handler->hasCallback('/^(.+)$/'));
+        $this->assertTrue($handler->hasTextHandler('/^(.+)$/'));
     }
 
     public function testClearCallback()
@@ -54,16 +61,16 @@ class HandlerTest extends TestCase
         $handler = new Handler();
         $result = '';
 
-        $handler->addCallback('/^(.+)$/', $this->getCallbackFunction($result));
-        $handler->clearCallbacks();
+        $handler->addTextHandler('/^(.+)$/', $this->getCallbackFunction($result));
+        $handler->clearTextHandler();
 
-        $this->assertFalse($handler->hasCallback('/^(.+)$/'));
+        $this->assertFalse($handler->hasTextHandler('/^(.+)$/'));
     }
 
     private function getCallbackFunction(&$result): callable
     {
-        return function ($updateData) use (&$result) {
-            $result = $updateData['message']['text'];
+        return function (Context $context) use (&$result) {
+            $result = $context->getUpdateData()['message']['text'];
         };
     }
 }
