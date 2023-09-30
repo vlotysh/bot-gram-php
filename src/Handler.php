@@ -133,6 +133,7 @@ class Handler
     {
         $callbackQuery = $updateData['callback_query'];
         list ($key, $params) = explode('|', $callbackQuery['data'] ?? '');
+        $callbackMessageId = $callbackQuery['message']['message_id'] ?? null;
         $chatId = $this->extractChatId($updateData);
 
         if (empty($chatId)) {
@@ -143,7 +144,7 @@ class Handler
             list($callbackKey, $handler) = $callback;
 
             if ($callbackKey === $key) {
-                $handler(new Context($updateData, $chatId, $params));
+                $handler(new Context($updateData, $chatId, $callbackMessageId, $params));
 
                 return;
             }

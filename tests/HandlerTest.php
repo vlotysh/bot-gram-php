@@ -130,6 +130,7 @@ class HandlerTest extends TestCase
                     'chat'=> [
                         'id' => 1,
                     ],
+                    'message_id' => 2,
                 ],
             ],
         ];
@@ -138,6 +139,7 @@ class HandlerTest extends TestCase
         $this->assertTrue($result['updateData'] === $updateData);
         $this->assertTrue($result['chatId'] === 1);
         $this->assertTrue($result['callbackParams'] === 'data');
+        $this->assertTrue($result['callbackMessageId'] === 2);
     }
 
     private function getTextHandlerFunction(&$result): callable
@@ -161,6 +163,7 @@ class HandlerTest extends TestCase
                 'chatId' => $context->getChatId(),
                 'updateData' => $context->getUpdateData(),
                 'callbackParams' => $context->getCallbackParams(),
+                'callbackMessageId' => $context->getCallbackMessageId(),
             ];
         };
     }
