@@ -13,7 +13,7 @@ class HandlerTest extends TestCase
         $handler = new Handler();
 
         $result = '';
-        $handler->addTextHandler('/^\/test/',$this->getCallbackFunction($result));
+        $handler->addTextHandler('/^\/test/',$this->getTextHandlerFunction($result));
 
         $handler->execute([
             'message' => [
@@ -32,7 +32,7 @@ class HandlerTest extends TestCase
         $handler = new Handler();
         $result = '';
 
-        $handler->addTextHandler('/^(.+)$/', $this->getCallbackFunction($result));
+        $handler->addTextHandler('/^(.+)$/', $this->getTextHandlerFunction($result));
 
         $handler->execute([
             'message' => [
@@ -51,7 +51,7 @@ class HandlerTest extends TestCase
         $handler = new Handler();
         $result = '';
 
-        $handler->addTextHandler('/^(.+)$/', $this->getCallbackFunction($result));
+        $handler->addTextHandler('/^(.+)$/', $this->getTextHandlerFunction($result));
 
         $this->assertTrue($handler->hasTextHandler('/^(.+)$/'));
     }
@@ -61,16 +61,107 @@ class HandlerTest extends TestCase
         $handler = new Handler();
         $result = '';
 
-        $handler->addTextHandler('/^(.+)$/', $this->getCallbackFunction($result));
+        $handler->addTextHandler('/^(.+)$/', $this->getTextHandlerFunction($result));
         $handler->clearTextHandler();
 
         $this->assertFalse($handler->hasTextHandler('/^(.+)$/'));
     }
 
-    private function getCallbackFunction(&$result): callable
+    public function testCallback()
+    {
+        $handler = new Handler();
+        $result = '';
+
+        $handler->addCallbackHandler('TestCallback', $this->getCallbackHandlerFunction($result));
+
+        $handler->execute([
+            'callback_query' => [
+                'data' => 'TestCallback|data',
+                'message' => [
+                    'chat'=> [
+                        'id' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($result === 'TestCallback|data');
+    }
+
+    public function testCondition()
+    {
+        $handler = new Handler();
+        $result1 = '';
+        $result2 = '';
+
+        $handler->addConditionsHandler(function (array $update) {
+            return true;
+        }, $this->getCallbackHandlerFunction($result1));
+
+        $handler->addCallbackHandler('TestCallback', $this->getCallbackHandlerFunction($result2));
+
+        $handler->execute([
+            'callback_query' => [
+                'data' => 'TestCallback|data',
+                'message' => [
+                    'chat'=> [
+                        'id' => 1,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($result1 === 'TestCallback|data');
+        $this->assertTrue($result2 === '');
+
+    }
+
+    public function testHandlerContext()
+    {
+        $handler = new Handler();
+        $result = [];
+
+        $handler->addCallbackHandler('TestCallback', $this->getCallbackWithContextFunction($result));
+
+        $updateData = [
+            'callback_query' => [
+                'data' => 'TestCallback|data',
+                'message' => [
+                    'chat'=> [
+                        'id' => 1,
+                    ],
+                ],
+            ],
+        ];
+        $handler->execute($updateData);
+
+        $this->assertTrue($result['updateData'] === $updateData);
+        $this->assertTrue($result['chatId'] === 1);
+        $this->assertTrue($result['callbackParams'] === 'data');
+    }
+
+    private function getTextHandlerFunction(&$result): callable
     {
         return function (Context $context) use (&$result) {
             $result = $context->getUpdateData()['message']['text'];
+        };
+    }
+
+    private function getCallbackHandlerFunction(&$result): callable
+    {
+        return function (Context $context) use (&$result) {
+            $result = $context->getUpdateData()['callback_query']['data'];
+        };
+    }
+
+    private function getCallbackWithContextFunction(&$result): callable
+    {
+        return function (Context $context) use (&$result) {
+            $result = [
+                'chatId' => $context->getChatId(),
+                'updateData' => $context->getUpdateData(),
+                'callbackParams' => $context->getCallbackParams(),
+            ];
         };
     }
 }

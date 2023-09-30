@@ -14,14 +14,18 @@ class Context
      */
     private int $chatId;
 
+    private ?string $callbackParams;
+
     /**
      * @param array $updateData
      * @param int $chatId
+     * @param string|null $callbackParams
      */
-    public function __construct(array $updateData, int $chatId)
+    public function __construct(array $updateData, int $chatId, string $callbackParams = null)
     {
         $this->updateData = $updateData;
         $this->chatId = $chatId;
+        $this->callbackParams = $callbackParams;
     }
 
     /**
@@ -38,5 +42,13 @@ class Context
     public function getChatId(): int
     {
         return $this->chatId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCallbackParams(): ?string
+    {
+        return $this->callbackParams;
     }
 }

@@ -28,14 +28,13 @@ class Handler
      */
     public function execute(array $updateData): void
     {
-        if (!empty($updateData['message']['text'])) {
+        if ($this->matchConditionHandlers($updateData)) {
+            return;
+        } elseif (!empty($updateData['message']['text'])) {
             $this->matchTextHandlers($updateData);
-        } elseif (!empty($updateData['callback_query']['message']['data'])) {
+        } elseif (!empty($updateData['callback_query']['data'])) {
             $this->matchCallbackHandlers($updateData);
-        } else {
-            $this->matchConditionHandlers($updateData);
         }
-
     }
 
     /**
@@ -52,14 +51,14 @@ class Handler
     }
 
     /**
-     * @param string $regexp
+     * @param string $callback
      * @param callable $handler
      * @return void
      */
-    public function addCallbackHandler(string $regexp, callable $handler): void
+    public function addCallbackHandler(string $callback, callable $handler): void
     {
         $this->callbackHandlers[] = [
-            $regexp,
+            $callback,
             $handler,
         ];
     }
@@ -133,7 +132,7 @@ class Handler
     private function matchCallbackHandlers(array $updateData)
     {
         $callbackQuery = $updateData['callback_query'];
-        $message = $callbackQuery['data'] ?? '';
+        list ($key, $params) = explode('|', $callbackQuery['data'] ?? '');
         $chatId = $this->extractChatId($updateData);
 
         if (empty($chatId)) {
@@ -141,10 +140,10 @@ class Handler
         }
 
         foreach ($this->callbackHandlers as $callback) {
-            list($callbackRegexp, $handler) = $callback;
+            list($callbackKey, $handler) = $callback;
 
-            if (preg_match($callbackRegexp, $message)) {
-                $handler(new Context($updateData, $chatId));
+            if ($callbackKey === $key) {
+                $handler(new Context($updateData, $chatId, $params));
 
                 return;
             }
@@ -153,10 +152,10 @@ class Handler
 
     /**
      * @param array $updateData
-     * @return void
+     * @return bool
      * @throws Exception
      */
-    private function matchConditionHandlers(array $updateData)
+    private function matchConditionHandlers(array $updateData): bool
     {
         $chatId = $this->extractChatId($updateData);
 
@@ -170,9 +169,11 @@ class Handler
             if ($condition($updateData)) {
                 $handler(new Context($updateData, $chatId));
 
-                return;
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
