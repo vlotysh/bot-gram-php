@@ -102,7 +102,7 @@ class HandlerTest extends TestCase
 
         $handler->execute([
             'callback_query' => [
-                'data' => 'TestCallback|data',
+                'data' => 'TestCallback2|data',
                 'message' => [
                     'chat'=> [
                         'id' => 1,
@@ -111,7 +111,7 @@ class HandlerTest extends TestCase
             ],
         ]);
 
-        $this->assertTrue($result1 === 'TestCallback|data');
+        $this->assertTrue($result1 === 'TestCallback2|data');
         $this->assertTrue($result2 === '');
 
     }

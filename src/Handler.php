@@ -28,12 +28,12 @@ class Handler
      */
     public function execute(array $updateData): void
     {
-        if ($this->matchConditionHandlers($updateData)) {
+        if ($this->matchTextHandlers($updateData)) {
             return;
-        } elseif (!empty($updateData['message']['text'])) {
-            $this->matchTextHandlers($updateData);
-        } elseif (!empty($updateData['callback_query']['data'])) {
-            $this->matchCallbackHandlers($updateData);
+        } elseif ($this->matchCallbackHandlers($updateData)) {
+            return;
+        } else {
+            $this->matchConditionHandlers($updateData);
         }
     }
 
@@ -104,9 +104,14 @@ class Handler
      * @return void
      * @throws Exception
      */
-    private function matchTextHandlers(array $updateData)
+    private function matchTextHandlers(array $updateData): bool
     {
         $text = $updateData['message']['text'] ?? '';
+
+        if (empty($text)) {
+            return false;
+        }
+
         $chatId = $updateData['message']['chat']['id'] ?? null;
 
         if (empty($chatId)) {
@@ -119,19 +124,26 @@ class Handler
             if (preg_match($callbackRegexp, $text)) {
                 $handler(new Context($updateData, $chatId));
 
-                return;
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
      * @param array $updateData
-     * @return void
+     * @return bool
      * @throws Exception
      */
-    private function matchCallbackHandlers(array $updateData)
+    private function matchCallbackHandlers(array $updateData): bool
     {
         $callbackQuery = $updateData['callback_query'];
+
+        if (empty($callbackQuery['data'])) {
+            return false;
+        }
+
         list ($key, $params) = explode('|', $callbackQuery['data'] ?? '');
         $callbackMessageId = $callbackQuery['message']['message_id'] ?? null;
         $chatId = $this->extractChatId($updateData);
@@ -146,9 +158,11 @@ class Handler
             if ($callbackKey === $key) {
                 $handler(new Context($updateData, $chatId, $callbackMessageId, $params));
 
-                return;
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
