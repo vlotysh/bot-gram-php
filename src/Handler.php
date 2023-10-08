@@ -138,7 +138,7 @@ class Handler
      */
     private function matchCallbackHandlers(array $updateData): bool
     {
-        $callbackQuery = $updateData['callback_query'];
+        $callbackQuery = $updateData['callback_query'] ?? [];
 
         if (empty($callbackQuery['data'])) {
             return false;
