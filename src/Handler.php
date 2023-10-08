@@ -180,7 +180,13 @@ class Handler
     {
         $callbackQuery = $updateData['callback_query'] ?? [];
         $chatId = $this->extractChatId($updateData);
-        list ($key, $params) = explode('|', $callbackQuery['data'] ?? '');
+
+        if (strpos($callbackQuery['data'], '|') !== false) {
+            list ($key, $params) = explode('|', $callbackQuery['data'] ?? '');
+        } else {
+            $params = $callbackQuery['data'];
+        }
+
         $callbackMessageId = $callbackQuery['message']['message_id'] ?? null;
 
         if (empty($chatId)) {
