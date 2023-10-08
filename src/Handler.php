@@ -172,7 +172,10 @@ class Handler
      */
     private function matchConditionHandlers(array $updateData): bool
     {
+        $callbackQuery = $updateData['callback_query'] ?? [];
         $chatId = $this->extractChatId($updateData);
+        list ($key, $params) = explode('|', $callbackQuery['data'] ?? '');
+        $callbackMessageId = $callbackQuery['message']['message_id'] ?? null;
 
         if (empty($chatId)) {
             throw new Exception('Empty chat id');
@@ -182,7 +185,7 @@ class Handler
             list($condition, $handler) = $callback;
 
             if ($condition($updateData)) {
-                $handler(new Context($updateData, $chatId));
+                $handler(new Context($updateData, $chatId, $callbackMessageId, $params));
 
                 return true;
             }
