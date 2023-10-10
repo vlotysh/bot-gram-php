@@ -71,4 +71,18 @@ class Bot
 
         return true;
     }
+
+    public function setWebhook(string $webhookUrl): bool
+    {
+        $this->client->get(
+            'setWebhook',
+            [
+                'query' => [
+                    'url' => $webhookUrl,
+                ]
+            ]
+        );
+
+        return true;
+    }
 }
