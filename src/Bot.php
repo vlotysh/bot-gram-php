@@ -35,11 +35,12 @@ class Bot
      * @return bool
      * @throws GuzzleException
      */
-    public function sendMessage(int $chatId, string $message, array $replyMarkup = []): bool
+    public function sendMessage(int $chatId, string $message, array $replyMarkup = [], $parseMode = 'html'): bool
     {
         $data = [
             'chat_id' => $chatId,
             'text' => $message,
+            'parse_mode' => $parseMode,
         ];
 
         if (!empty($replyMarkup)) {
@@ -53,12 +54,18 @@ class Bot
         return true;
     }
 
-    public function editMessage(int $chatId, int $messageId, string $message, array $replyMarkup = []): bool
-    {
+    public function editMessage(
+        int $chatId,
+        int $messageId,
+        string $message,
+        array $replyMarkup = [],
+        $parseMode = 'html'
+    ): bool {
         $data = [
             'chat_id' => $chatId,
             'message_id' => $messageId,
             'text' => $message,
+            'parse_mode' => $parseMode,
         ];
 
         if (!empty($replyMarkup)) {
