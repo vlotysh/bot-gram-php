@@ -1,6 +1,6 @@
 {
     "name": "vlotysh/bot-gram-php",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "PHP client for telegram",
     "type": "library",
     "license": "MIT",
@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
-        "guzzlehttp/guzzle": "^6.0|^7.0",
+        "php": "^8.0",
+        "guzzlehttp/guzzle": "^7.0",
         "ext-json": "*"
     },
     "require-dev": {
